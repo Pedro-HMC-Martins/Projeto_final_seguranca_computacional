@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Token - SIGAA-UFPB</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: radial-gradient(circle, #ffffff, #9ba6c7);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-container {
+            background-color: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-weight: bold;
+            color: #35457E;
+        }
+        .logo {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: #35457E;
+            border-color: #35457E;
+            color: white;
+            border-radius: 5px;
+            padding: 8px 20px;
+            font-size: 1rem;
+            display: inline-block;
+            width: auto;
+        }
+
+        .btn-primary:hover {
+            background-color: #004494;
+            border-color: #004494;
+        }
+
+        .footer-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footer-links a {
+            color: #35457E;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .copyright {
+            margin-top: 20px;
+            font-size: 0.85em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img class="logo" src="https://sigaa.ufpb.br/sigaa/shared/beta/img/sigaa-logo.png" alt="Brasão da UFPB">
+        <h1>Confirmação de E-mail</h1>
+        <p>Por favor, insira o código que você recebeu em seu e-mail.</p>
+        <form id="token-verify-form" method="post" action="{{ url_for('token_verify') }}">
+            <input type="text" id="codigo" name="codigo" class="form-control" placeholder="Código de Confirmação" required>
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+        </form>
+    </div>
+</body>
+</html>
