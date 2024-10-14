@@ -10,18 +10,16 @@ MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_TIME = timedelta(minutes=10)
 
 def quarantine(user_id, ip_address):
-    # Utilizando UTC para a comparação de tempo
     now = datetime.now(timezone.utc)
 
-    # Verificando se o usuário ou o IP está em quarentena
     find_user = Quarantine.query.filter(
         Quarantine.user_id == user_id,
-        Quarantine.end_time >= now  # Comparando com UTC
+        Quarantine.end_time >= now 
     ).first() 
     
     find_ip = Quarantine.query.filter(
         Quarantine.ip_address == ip_address,
-        Quarantine.end_time >= now  # Comparando com UTC
+        Quarantine.end_time >= now 
     ).first() 
     
     if find_user or find_ip:
@@ -31,23 +29,19 @@ def quarantine(user_id, ip_address):
     
 
 def check_limit(user_id, ip_address):
-    # Utilizando UTC para o limite de tempo
     now = datetime.now(timezone.utc)
     time_threshold = now - LOCKOUT_TIME
-    
-    # Contar as tentativas de login falhadas com base no tempo UTC
     failed_attempts = Log.query.filter(
         Log.user_id == user_id,
-        Log.timestamp >= time_threshold,  # Comparando com UTC
+        Log.timestamp >= time_threshold,  
         Log.success == False  
     ).count()
 
-    # Se as tentativas falhadas excederem o limite, colocar o usuário em quarentena
     if failed_attempts >= MAX_FAILED_ATTEMPTS:
         quarantine_entry = Quarantine(
             user_id=user_id,
-            start_time=now,  # Usando UTC
-            end_time=now + LOCKOUT_TIME,  # Usando UTC
+            start_time=now, 
+            end_time=now + LOCKOUT_TIME, 
             reason='TOO MANY ATTEMPTS',
             ip_address=ip_address
         )
