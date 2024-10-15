@@ -30,6 +30,7 @@
             font-weight: bold;
             color: #35457E;
         }
+
         .logo {
             width: 80px;
             margin-bottom: 20px;
@@ -56,6 +57,25 @@
             border-color: #004494;
         }
 
+        .password-strength {
+            margin-top: -15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .weak {
+            color: red;
+        }
+
+        .moderate {
+            color: orange;
+        }
+
+        .strong {
+            color: green;
+        }
+
         .footer-links {
             margin-top: 20px;
             text-align: center;
@@ -76,6 +96,11 @@
             font-size: 0.85em;
             color: #777;
         }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -83,13 +108,65 @@
         <img class="logo" src="https://sigaa.ufpb.br/sigaa/shared/beta/img/sigaa-logo.png" alt="Brasão da UFPB">
         <h1>Cadastro - SIGAA 2 - UFPB</h1>
         <form id="cadastro-form" method="post" action="{{ url_for('register') }}">
-            <input type="email" id="email" name="email" class="form-control" placeholder="E-mail Institucional" required>
-            <input type="password" id="senha" name="senha" class="form-control" placeholder="Crie uma Senha" required>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <input type="email" id="email" name="email" class="form-control" placeholder="E-mail Institucional" required oninput="validateEmail()">
+            <div id="email-error" class="error"></div>
+
+            <input type="password" id="senha" name="senha" class="form-control" placeholder="Crie uma Senha" required oninput="checkPasswordStrength()">
+            <div id="password-strength" class="password-strength"></div>
+
+            <button type="submit" class="btn btn-primary" id="submit-btn" disabled>Cadastrar</button>
         </form>
         <div class="footer-links">
             <a href="/">Já possui uma conta? Entrar</a>
         </div>
     </div>
+
+    <script>
+        // Função para validar e-mail conforme OWASP
+        function validateEmail() {
+            const email = document.getElementById('email').value;
+            const emailError = document.getElementById('email-error');
+            const submitBtn = document.getElementById('submit-btn');
+
+            // Expressão regular que segue boas práticas do OWASP para validação de e-mails
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (!emailRegex.test(email)) {
+                emailError.textContent = "Formato de e-mail inválido";
+                submitBtn.disabled = true;
+            } else {
+                emailError.textContent = "";
+                submitBtn.disabled = false; // Ativa o botão se e-mail for válido
+            }
+        }
+
+        // Função para verificar a força da senha
+        function checkPasswordStrength() {
+            const password = document.getElementById('senha').value;
+            const strengthIndicator = document.getElementById('password-strength');
+            let strength = 'fraca';
+
+            const regexWeak = /(?=.{6,})/; // Pelo menos 6 caracteres
+            const regexModerate = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/; // Letras maiúsculas, minúsculas e números
+            const regexStrong = /(?=.*[!@#\$%\^&\*])/; // Caracteres especiais
+
+            if (regexWeak.test(password)) {
+                strength = 'fraca';
+                strengthIndicator.className = 'password-strength weak';
+            }
+
+            if (regexModerate.test(password)) {
+                strength = 'moderada';
+                strengthIndicator.className = 'password-strength moderate';
+            }
+
+            if (regexStrong.test(password) && password.length >= 8) {
+                strength = 'forte';
+                strengthIndicator.className = 'password-strength strong';
+            }
+
+            strengthIndicator.textContent = `Força da senha: ${strength}`;
+        }
+    </script>
 </body>
 </html>
