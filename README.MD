@@ -2,7 +2,7 @@ Crie uma ambiente vitual.
 
 Em seguida use o comando:
 
-pip install -r requirements
+pip install -r requirements.txt
 
 para instalar todas as dependências
 
