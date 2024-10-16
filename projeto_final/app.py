@@ -41,6 +41,7 @@ def login():
         email = request.form.get('email', '')
         senha = request.form.get('password', '')
         
+        #Verificacao de injecao
         sql_injection_detected = is_sql_injection(email) or is_sql_injection(senha)
         xss_detected = is_xss_attempt(email) or is_xss_attempt(senha)
         command_injection_detected = is_command_injection(email) or is_command_injection(senha)
@@ -64,10 +65,13 @@ def login():
             # Log the event
             if sql_injection_detected:
                 log_event(user_id, ip_address, 'LOGIN_FAILURE_WITH_SQL_INJECTION_ATTEMPT', 'Possivel tentativa de SQL Injection durante o login', False)
+                move_quarantine(user_id=user_id,ip_address=ip_address, reason='SQL INJECTION ATTEMPT')
             elif xss_detected:
                 log_event(user_id, ip_address, 'LOGIN_FAILURE_WITH_XSS_INJECTION_ATTEMPT', 'Possivel tentativa de XSS Injection durante o login', False)
+                move_quarantine(user_id=user_id,ip_address=ip_address, reason='XSS ATTEMPT')
             elif command_injection_detected:
                 log_event(user_id, ip_address, 'LOGIN_FAILURE_WITH_COMMAND_INJECTION_ATTEMPT', 'Possivel tentativa de Command Injection durante o login', False)
+                move_quarantine(user_id=user_id,ip_address=ip_address, reason='COMMAND INJECTION ATTEMPT')
             else:
                 log_event(user_id, ip_address, 'LOGIN_FAILURE', 'Falha ao tentar efetuar login', False)
             

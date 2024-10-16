@@ -6,27 +6,34 @@ from db.models.users import User
 from flask import current_app
 from flask_mail import Message
 
-MAX_FAILED_ATTEMPTS = 5
+MAX_FAILED_ATTEMPTS = 3
 LOCKOUT_TIME = timedelta(minutes=10)
+
+def move_quarantine(user_id, ip_address, reason):
+    now = datetime.now(timezone.utc)
+    quarantine_entry = Quarantine(
+        user_id=user_id,
+        start_time=now, 
+        end_time=now + LOCKOUT_TIME, 
+        reason= reason,
+        ip_address=ip_address
+        )
+    try:
+        db.session.add(quarantine_entry)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f'Ocorreu um erro ao colocar em quarentena: {e}')
 
 def quarantine(user_id, ip_address):
     now = datetime.now(timezone.utc)
 
-    find_user = Quarantine.query.filter(
-        Quarantine.user_id == user_id,
-        Quarantine.end_time >= now 
-    ).first() 
-    
-    find_ip = Quarantine.query.filter(
-        Quarantine.ip_address == ip_address,
-        Quarantine.end_time >= now 
-    ).first() 
-    
-    if find_user or find_ip:
-        return True
-    
-    return False
-    
+    find_quarantine = Quarantine.query.filter(
+        (Quarantine.user_id == user_id) | (Quarantine.ip_address == ip_address),
+        Quarantine.end_time >= now
+    ).first()
+
+    return bool(find_quarantine)
 
 def check_limit(user_id, ip_address):
     now = datetime.now(timezone.utc)
@@ -38,18 +45,8 @@ def check_limit(user_id, ip_address):
     ).count()
 
     if failed_attempts >= MAX_FAILED_ATTEMPTS:
-        quarantine_entry = Quarantine(
-            user_id=user_id,
-            start_time=now, 
-            end_time=now + LOCKOUT_TIME, 
-            reason='TOO MANY ATTEMPTS',
-            ip_address=ip_address
-        )
-        try:
-            db.session.add(quarantine_entry)
-            db.session.commit()
-        except Exception as e:
-            print(f'Ocorreu um erro ao colocar em quarentena: {e}')
+        
+        move_quarantine(user_id=user_id,ip_address=ip_address, reason='TOO MANY ATTEMPTS')
             
         if user_id:
             user = User.query.get(user_id)

@@ -1,14 +1,11 @@
 sql injection
 
 user@example.com' UNION SELECT * FROM users;--
-password123
 
 xss attempt
 
 <script>alert('XSS');</script>
-password123
 
 command injection
 
-user@example.com
 ; ls -la
